@@ -5,15 +5,18 @@ class Point{
 
     public:
         int x, y;
-        Point();
+        Point(){}
         Point(int x, int y){
             this -> x = x;
             this -> y = y;
         }
-        ~Point();
+        ~Point(){}
+        static bool areHorizontal(Point a, Point b){
+            return a.y == b.y;
+        }
 
 
 
-}
+};
 
 #endif

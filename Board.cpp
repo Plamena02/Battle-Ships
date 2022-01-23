@@ -1,77 +1,35 @@
-#include"Point.h"
-#include<iostream>
-#include<utility>
-#include<windows.h>
-using namespace std;
+#include "Board.h"
 
-void print(string board[11][11], HANDLE h)
-{
-    SetConsoleTextAttribute(h,63);
+Board::Board(){
 
-    for(int i = 0; i<11; i++)
-    {
-        for(int j = 0; j<11; j++)
-        {
-            if(board[i][j] == " *")// miss
-            {
-                SetConsoleTextAttribute(h,48); // blue and black
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
+    this->board = new string*[this->boardDimensions];
+    for(int i = 0; i < this->boardDimensions; i++)
+        this->board[i] = new string[this->boardDimensions];
 
-            if(board[i][j] == " X") //hit
-            {
-                SetConsoleTextAttribute(h,60); // blue and red
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
-
-            if(board[i][j] == " @") //ship
-            {
-                SetConsoleTextAttribute(h,56); // blue and grey
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
-
-            cout << board[i][j];
-
-        }
-        cout << '\n';
-    }
-
-    SetConsoleTextAttribute(h,15);
-}
-
-void createEmptyBoard(string board[11][11])
-{
-    board[0][0] = "   ";
-    board[10][0] = "10";
-    board[0][10] = "J";
+    this->board[0][0] = "   ";
+    this->board[this->boardDimensions - 1][0] = "10";
+    this->board[0][this->boardDimensions - 1] = "J";
     char start = 'A';
 
-    for(int i = 1; i<10; i++)
+    for(int i = 1; i<this->boardDimensions - 1; i++)
     {
-        board[i][0] = i + '0';
-        board[i][0] += " ";
-        board[0][i] = (start + i-1);
-        board[0][i] += " ";
+        this->board[i][0] = i + '0';
+        this->board[i][0] += " ";
+        this->board[0][i] = (start + i-1);
+        this->board[0][i] += " ";
     }
 
-    for(int i = 1; i<11; i++)
+    for(int i = 1; i<this->boardDimensions; i++)
     {
-        for(int j = 1; j<11; j++)
+        for(int j = 1; j<this->boardDimensions; j++)
         {
-            board[i][j] = "  ";
+            this->board[i][j] = "  ";
         }
     }
+
 }
 
-
-
-bool checkIfShipFits(pair<Point,string> arr[], int index)
+bool Board::checkIfShipFits(pair<Point,Point> arr[], int index)
 {
     if(arr[index-1].first.x>10 || arr[index-1].first.x<0 || arr[index-1].first.y>10 || arr[index-1].first.y<0)
     {
@@ -84,7 +42,7 @@ bool checkIfShipFits(pair<Point,string> arr[], int index)
         {
             for(int k = arr[i].first.y-1; k<= arr[i].second.y+1; k++)
             {
-                for(int j = arr[index-1].first.x; j)
+                // for(int j = arr[index-1].first.x; j)
             }
         }
         else
@@ -96,23 +54,47 @@ bool checkIfShipFits(pair<Point,string> arr[], int index)
     return true;
 }
 
-int main()
-{
-    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); //color changer
-    string board[11][11];
+bool Board::moveIsValid(Point coordinates){
 
-    createEmptyBoard(board);
+    if(coordinates.x < 1 ||
+        coordinates.x > 10 ||
+        coordinates.y < 1 ||
+        coordinates.y > 10 ||
+        this->board[coordinates.y][coordinates.x] != "  ")
+        return false;
+    return true;
 
-    print(board, h);
-    cout << '\n';
-
-    board[1][1] = " @";
-    board[2][1] = " @";
-    board[3][1] = " @";
-    board[4][1] = " @";
-    board[4][8] = " *";
-    board[4][7] = " *";
-    board[1][6] = " X";
-
-    print(board, h);
 }
+
+void Board::placeShips(pair<Point, Point> coordinates[]){
+
+    for(int i = 0; i < Constants::totalShipCount; i++)
+        if(Point::areHorizontal(coordinates[i].first, coordinates[i].second))
+            for(int j = coordinates[i].first.x; j < coordinates[i].second.x; j++)
+                board[coordinates[i].first.y][j] = this->shipSymbol;
+        else
+            for(int j = coordinates[i].first.y; j < coordinates[i].second.y; j++)
+                board[j][coordinates[i].first.x] = this->shipSymbol;
+
+}
+
+// int main()
+// {
+//     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); //color changer
+//     string board[11][11];
+
+//     createEmptyBoard(board);
+
+//     print(board, h);
+//     cout << '\n';
+
+//     board[1][1] = " @";
+//     board[2][1] = " @";
+//     board[3][1] = " @";
+//     board[4][1] = " @";
+//     board[4][8] = " *";
+//     board[4][7] = " *";
+//     board[1][6] = " X";
+
+//     print(board, h);
+// }
