@@ -1,64 +1,136 @@
+/**
+*
+* Solution to course project #8
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2021/2022
+*
+* @author Plamena Nikolova
+* @idnumber 1MI0600031
+* @compiler gcc
+*
+* <functions for player>
+*
+*/
+
 #include "Player.h"
 
-Player::Player(){
+Player::Player(const int smallShips, const int mediumShips, const int bigShips, const int largeShips){
 
-    this->ships = new Ship[Constants::totalShipCount];
+    const int totalShipCount = smallShips + mediumShips + bigShips + largeShips;
+    this->ships = new Ship[totalShipCount];
 
-    for(int i = 0; i < Constants::smallShips; i++)
+    for(int i = 0; i < smallShips; i++)
         this->ships[i] = Ship(2);
-    for(int i = Constants::smallShips; i < Constants::smallShips + Constants::mediumShips; i++)
+    for(int i =  smallShips; i <  smallShips +  mediumShips; i++)
         this->ships[i] = Ship(3);
-    for(int i = Constants::smallShips + Constants::mediumShips; i < Constants::smallShips + Constants::mediumShips + Constants::bigShips; i++)
+    for(int i =  smallShips +  mediumShips; i <  smallShips +  mediumShips +  bigShips; i++)
         this->ships[i] = Ship(4);
-    for(int i = Constants::smallShips + Constants::mediumShips + Constants::bigShips; i < Constants::smallShips + Constants::mediumShips + Constants::bigShips + Constants::largeShips; i++)
+    for(int i =  smallShips +  mediumShips +  bigShips; i <  smallShips +  mediumShips +  bigShips +  largeShips; i++)
         this->ships[i] = Ship(6);
 
-    this->populateBoard();
+    this->populateBoard(totalShipCount);
 
 }
 
-void Player::populateBoard(){
+void Player::populateBoard(const int totalShipCount){
 
-    pair<Point, Point> coordinates[Constants::totalShipCount];
-    cout << "Available ships:\n";
-    for(int i = 0; i < Constants::totalShipCount; i++){
+    pair<Point, Point> coordinates[totalShipCount];
+    ifstream myInput("input.txt");
+    int index = 0, addedShips = 0;
+    bool temp = true;
+    
+    cout << "Do you want to use board template for ships (0/1) ?  ";
+    cin >> temp;
+
+    for(int i = 0; i < totalShipCount; i++){
+
+        this->playerBoard.printBoard();
+
+        if(i > 0){
+
+            bool choice;
+            if(temp)
+                myInput >> choice;
+            else{
+
+                cout << "0.Add new\n1.Replace\nChoice: ";
+                cin >> choice;
+
+            }
+
+            if(choice){
+
+                if(temp)
+                    myInput >> choice;
+                else{
+                    
+                    cout << "Select ship to edit(1," << i << "): ";
+                    cin >> index;
+
+                }
+                index--;
+                i--;
+
+            }
+
+        }
 
         cout << "Ship -> " << ships[i].getName() << " with lenght " << ships[i].getLenght() << '\n';
         bool vertical;
-        cout << "Vertical or Horizontal: ";
-        cin >> vertical;
+        if(temp)
+            myInput >> vertical;
+        else{
+            
+            cout << "Vertical or Horizontal(1/0): ";
+            cin >> vertical;
 
-        int index = 0;
+        }
+
+        pair<Point, Point> newCoords;
 
         while(true){
 
-            cout << "Input x: ";
-            cin >> coordinates[index].first.x;
-            cout << "Input y: ";
-            cin >> coordinates[index].first.y;
+            if(temp)
+                myInput >> newCoords.first.x;
+            else{
+                
+                cout << "Input x: ";
+                cin >> newCoords.first.x;
+
+            }
+            if(temp)
+                myInput >> newCoords.first.y;
+            else{
+
+                cout << "Input y: ";
+                cin >> newCoords.first.y;
+            
+            }
 
             if(vertical){
-                coordinates[index].second.y = coordinates[index].first.y + ships[i].getLenght();
-                coordinates[index].second.x = coordinates[index].first.x;
+                newCoords.second.y = newCoords.first.y + ships[i].getLenght() - 1;
+                newCoords.second.x = newCoords.first.x;
             }
             else{
-                coordinates[index].second.x = coordinates[index].first.x + ships[i].getLenght();
-                coordinates[index].second.y = coordinates[index].first.y;
+                newCoords.second.x = newCoords.first.x + ships[i].getLenght() - 1;
+                newCoords.second.y = newCoords.first.y;
             }
 
-            if(this->playerBoard.checkIfShipFits(coordinates, index + 1))
+            if(this->playerBoard.checkIfShipFits(coordinates, i, newCoords))
                 break;
 
             cout << "Move is invalid!\n";
 
         }
 
-        index++;
+        coordinates[index] = newCoords;
+        index = i + 1;
 
+        this->playerBoard.placeShips(coordinates, i + 1);
     }
 
-    this->playerBoard.placeShips(coordinates);
-    cout << "Player has finished populating board!\n";
+    myInput.close();
 
 }
 
@@ -73,7 +145,7 @@ Point Player::makeMove(){
         cout << "Input y: ";
         cin >> coordinates.y;
 
-        if(this->enemyBoard.moveIsValid(coordinates))
+        if(this->enemyBoard.isInsideBoard(coordinates))
             break;
 
         cout << "Move is invalid!\n";

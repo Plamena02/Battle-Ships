@@ -1,91 +1,106 @@
+/**
+*  
+* Solution to course project #8
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2021/2022
+*
+* @author Plamena Nikolova
+* @idnumber 1MI0600031
+* @compiler gcc
+*
+* <functions for game>
+*
+*/
+
 #include "Game.h"
 
-Game::Game(){
+Game::Game()
+{
 
-    while(true){
+    bool running = true;
+    while (running)
+    {
 
-        turn(0);
-        if(winCondition(true))
-       {
-           /// Player 1 wins
-           break;
-       }
-        turn(1);
-        if(winCondition(false)){
-            /// Player 2 wins
+        cout << "First Player turn\n";
+        printBoards(0);
+        while (turn(0))
+        {
+            printBoards(0);
+            if (winCondition(true))
+            {
+                cout << "Player 1 win!";
+                running = false;
+                break;
+            }
+        }
+        if (!running)
             break;
+        cout << "Second Player turn\n";
+        printBoards(1);
+        while (turn(1))
+        {
+            printBoards(1);
+            if (winCondition(false))
+            {
+                cout << "Player 2 win!";
+                running = false;
+                break;
+            }
         }
     }
-
 }
 
-void Game::turn(int player)
+bool Game::turn(const bool player)
 {
+
     Point point;
     cout << "Coordinats where you think there is a ship.\n";
-    cout << "Input x: "
+    cout << "Input x: ";
     cin >> point.x;
-    cout << "Input y: "
+    cout << "Input y: ";
     cin >> point.y;
 
     //validate point
-
-    this->players[player].playerBoard.placeOnBoard(point);
-
-    if(this->players[player].playerBoard.hitOrMiss)
+    while (!(this->players[player].getEnemyBoard().moveIsValid(point)))
     {
-        this->players[player].sinkShip();
-        cout << "You hit a ship."
-        return;
+        cout << "Invalid point. Try again: \n";
+        cout << "Input x: ";
+        cin >> point.x;
+        cout << "Input y: ";
+        cin >> point.y;
     }
-    cout << "You miss."
-    return;
-}
 
-bool Game::winCondition(const bool checkForFirstPlayer){
-    if(checkForFirstPlayer)
-        return this->players[1].getSunkShips() == Constants::totalShipCount;
-    return this->players[0].getSunkShips() == Constants::totalShipCount;
-}
+    const bool hit = this->players[!player].getPlayerBoard().hitOrMiss(point);
+    this->players[player].getEnemyBoard().placeOnBoard(point, hit);
 
-
-void print(string board[11][11], HANDLE h)
-{
-    SetConsoleTextAttribute(h,63);
-
-    for(int i = 0; i<11; i++)
+    if (hit)
     {
-        for(int j = 0; j<11; j++)
+        cout << "You hit a ship.\n";
+        if (this->players[!player].getPlayerBoard().shipHasSunk(point))
         {
-            if(board[i][j] == " *")// miss
-            {
-                SetConsoleTextAttribute(h,48); // blue and black
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
-
-            if(board[i][j] == " X") //hit
-            {
-                SetConsoleTextAttribute(h,60); // blue and red
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
-
-            if(board[i][j] == " @") //ship
-            {
-                SetConsoleTextAttribute(h,56); // blue and grey
-                cout << board[i][j];
-                SetConsoleTextAttribute(h,63); // blue and white
-                continue;
-            }
-
-            cout << board[i][j];
-
+            this->players[!player].sinkShip();
+            cout << "You have sunk a ship!\n";
         }
-        cout << '\n';
+        return true;
     }
+    cout << "You miss.\n";
+    return false;
+}
 
-    SetConsoleTextAttribute(h,15);
+bool Game::winCondition(const bool checkForFirstPlayer)
+{
+    if (checkForFirstPlayer)
+        return this->players[1].getSunkShips() == this->totalShipCount;
+    return this->players[0].getSunkShips() == this->totalShipCount;
+}
+
+void Game::printBoards(const int playerIndex)
+{
+
+    cout << "My board:\n";
+    this->players[playerIndex].getPlayerBoard().printBoard();
+    cout << "\nEnemy board:\n";
+    this->players[playerIndex].getEnemyBoard().printBoard();
+
 }
