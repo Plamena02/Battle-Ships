@@ -36,18 +36,22 @@ bool Board::checkIfShipFits(pair<Point,Point> arr[], int index)
         return false;
     }
 
+
     for(int i = index-2; i>=0; i--)
     {
-        if(arr[i].first.x == arr[i].second.x)
+        if(Point::isHorizontal(arr[i])) // horizontal ships
         {
-            for(int k = arr[i].first.y-1; k<= arr[i].second.y+1; k++)
-            {
-                // for(int j = arr[index-1].first.x; j)
-            }
+            if(((arr[index-1].second.x >= arr[i].first.x-1 && arr[index-1].second.x <= arr[i].first.x+1) ||
+                (arr[index-1].first.x >= arr[i].first.x-1 && arr[index-1].first.x <= arr[i].first.x+1))
+                && arr[index-1].second.y >= arr[i].first.y-1 && arr[index-1].first.y <= arr[i].second.y-1)
+                    return false;
         }
-        else
+        else // vertical ships
         {
-
+            if(((arr[index-1].second.y >= arr[i].first.y-1 && arr[index-1].second.y <= arr[i].first.y+1)
+                || (arr[index-1].first.y <= arr[i].second.y-1 && arr[index-1].first.y >= arr[i].second.y+1))
+               && arr[index-1].second.x >= arr[i].first.x-1 && arr[index-1].second.x <= arr[i].first.x+1)
+                return false;
         }
     }
 
@@ -69,32 +73,37 @@ bool Board::moveIsValid(Point coordinates){
 void Board::placeShips(pair<Point, Point> coordinates[]){
 
     for(int i = 0; i < Constants::totalShipCount; i++)
-        if(Point::areHorizontal(coordinates[i].first, coordinates[i].second))
+        if(Point::isHorizontal(coordinates[i]))
             for(int j = coordinates[i].first.x; j < coordinates[i].second.x; j++)
-                board[coordinates[i].first.y][j] = this->shipSymbol;
+                this->board[coordinates[i].first.y][j] = this->shipSymbol;
         else
             for(int j = coordinates[i].first.y; j < coordinates[i].second.y; j++)
-                board[j][coordinates[i].first.x] = this->shipSymbol;
+                this->board[j][coordinates[i].first.x] = this->shipSymbol;
 
 }
 
-// int main()
-// {
-//     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); //color changer
-//     string board[11][11];
+bool Board::hitOrMiss(Point point)
+{
+    if(this->board[point.y][point.x] == this->shipSymbol)
+    {
+        return true;
+    }
+    return false;
+}
 
-//     createEmptyBoard(board);
+void Board::placeOnBoard(Point point)
+{
 
-//     print(board, h);
-//     cout << '\n';
+    if(this->hitOrMiss(point))
+    {
+        this->board[point.y][point.x] = this->hitSymbol;
+    }
+    else
+    {
+        this->board[point.y][point.x] = this->missSymbol;
+    }
 
-//     board[1][1] = " @";
-//     board[2][1] = " @";
-//     board[3][1] = " @";
-//     board[4][1] = " @";
-//     board[4][8] = " *";
-//     board[4][7] = " *";
-//     board[1][6] = " X";
+    return;
+}
 
-//     print(board, h);
-// }
+

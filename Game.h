@@ -13,7 +13,7 @@ class Game{
         Game();
         ~Game(){}
 
-        void turn();
+        void turn(int player);
         bool winCondition(const bool checkForFirstPlayer=true);
 
 };

@@ -2,13 +2,45 @@
 
 Game::Game(){
 
-    while(!(winCondition(true) || winCondition(false))){
-        turn();
+    while(true){
+
+        turn(0);
+        if(winCondition(true))
+       {
+           /// Player 1 wins
+           break;
+       }
+        turn(1);
+        if(winCondition(false)){
+            /// Player 2 wins
+            break;
+        }
     }
 
 }
 
-void Game::turn(){}
+void Game::turn(int player)
+{
+    Point point;
+    cout << "Coordinats where you think there is a ship.\n";
+    cout << "Input x: "
+    cin >> point.x;
+    cout << "Input y: "
+    cin >> point.y;
+
+    //validate point
+
+    this->players[player].playerBoard.placeOnBoard(point);
+
+    if(this->players[player].playerBoard.hitOrMiss)
+    {
+        this->players[player].sinkShip();
+        cout << "You hit a ship."
+        return;
+    }
+    cout << "You miss."
+    return;
+}
 
 bool Game::winCondition(const bool checkForFirstPlayer){
     if(checkForFirstPlayer)

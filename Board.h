@@ -23,6 +23,7 @@ class Board{
         bool checkIfShipFits(pair<Point,Point> arr[], int index);
         bool moveIsValid(Point coordinates);
         void placeShips(pair<Point, Point> coordinates[]);
+        bool hitOrMiss(Point point);
 
 };
 

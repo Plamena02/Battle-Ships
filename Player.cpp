@@ -13,6 +13,8 @@ Player::Player(){
     for(int i = Constants::smallShips + Constants::mediumShips + Constants::bigShips; i < Constants::smallShips + Constants::mediumShips + Constants::bigShips + Constants::largeShips; i++)
         this->ships[i] = Ship(6);
 
+    this->populateBoard();
+
 }
 
 void Player::populateBoard(){
@@ -56,6 +58,7 @@ void Player::populateBoard(){
     }
 
     this->playerBoard.placeShips(coordinates);
+    cout << "Player has finished populating board!\n";
 
 }
 

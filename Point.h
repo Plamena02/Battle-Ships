@@ -1,5 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
+#include <utility>
+
+using std::pair;
 
 class Point{
 
@@ -11,12 +14,9 @@ class Point{
             this -> y = y;
         }
         ~Point(){}
-        static bool areHorizontal(Point a, Point b){
-            return a.y == b.y;
+        static bool isHorizontal(pair<Point,Point> a){
+            return a.first.y == a.second.y;
         }
-
-
-
 };
 
 #endif
