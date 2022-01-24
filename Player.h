@@ -40,7 +40,7 @@ public:
     Player(const int smallShips, const int mediumShips, const int bigShips, const int largeShips);
     ~Player() {}
 
-    void populateBoard(const int totalShipCount);
+    void populateBoard();
     Point makeMove();
     void sinkShip()
     {

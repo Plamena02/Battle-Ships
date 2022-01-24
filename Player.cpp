@@ -29,12 +29,12 @@ Player::Player(const int smallShips, const int mediumShips, const int bigShips, 
     for(int i =  smallShips +  mediumShips +  bigShips; i <  smallShips +  mediumShips +  bigShips +  largeShips; i++)
         this->ships[i] = Ship(6);
 
-    this->populateBoard(totalShipCount);
+    this->populateBoard();
 
 }
 
-void Player::populateBoard(const int totalShipCount){
-
+void Player::populateBoard(){
+    const int totalShipCount = 10;
     pair<Point, Point> coordinates[totalShipCount];
     ifstream myInput("input.txt");
     int index = 0, addedShips = 0;
